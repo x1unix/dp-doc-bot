@@ -11,10 +11,10 @@ export const bootstrapService = async (
 
   bot.start(startHandler)
   bot.help(startHandler)
-  bot.on('message', (ctx) => checkHandler.handleMessage(ctx))
   bot.command('echo', (ctx) => {
-    ctx.reply(ctx.text)
+    ctx.reply(ctx.payload)
   })
+  bot.on('message', (ctx) => checkHandler.handleMessage(ctx))
 
   return {
     dispose: () => checkerSvc.dispose()
