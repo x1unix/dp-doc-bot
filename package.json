@@ -8,6 +8,7 @@
     "build": "swc src --out-dir dist/src",
     "build:ci": "tsc && npm run build:dev",
     "build:watch": "swc src -w --out-dir dist/src",
+    "start": "node dist/src/app.js",
     "start:dev": "concurrently \"npm run build:watch\" \"nodemon --watch 'dist/**/*.js' -e js dist/src/app.js\""
   },
   "author": "sdm95",

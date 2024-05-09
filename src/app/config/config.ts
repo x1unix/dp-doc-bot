@@ -40,22 +40,26 @@ export const config = convict({
       format: 'required-string',
       env: 'BOT_WEBHOOK_SECRET',
       default: null,
+    },
+    updateWebhookOnStart: {
+      doc: 'Update webhook URL on service start',
+      format: 'boolean',
+      env: 'BOT_UPDATE_WEBHOOK_ON_BOOT',
+      default: false,
     }
   }
 })
 
-export const getWebhookPath = () => {
+export type Config = typeof config
+
+export const getWebhookPath = (hookEndpoint: string) => {
   const url = new URL(config.get('baseUrl'))
   if (!url.pathname.endsWith('/')) {
     // Normalize URL path
     url.pathname += '/'
   }
 
-  const secret = config.get('telegram.webhookSecret')
-  const hookPath = `${url.pathname}/${secret}`
+  const hookPath = `${url.pathname}${hookEndpoint}`
 
-  return { domain: url.host, path: hookPath }
+  return { domain: url.host, path: hookPath, url: `${url.origin}${hookPath}` }
 }
-
-export type Config = typeof config
-

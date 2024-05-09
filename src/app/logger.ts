@@ -4,15 +4,11 @@ import { isProduction } from './config/config.ts'
 
 const transport = new transports.Console({
   stderrLevels: ['warn', 'error'],
-  format: format.simple()
 })
 
 export const logger = createLogger({
   level: isProduction ? 'warn' : 'info',
-  defaultMeta: {
-    tag: 'app'
-  },
-  // Define levels required by Fastify (by default winston has verbose level and does not have trace)
+  // Define levels required by Fastify (by default has verbose level and does not have trace)
   levels: {
     fatal: 0,
     error: 1,
@@ -30,4 +26,9 @@ export const logger = createLogger({
   rejectionHandlers: [
     transport,
   ],
+  format: format.combine(
+    format.timestamp(),
+    format.errors({ stack: true }),
+    format.prettyPrint()
+  )
 })

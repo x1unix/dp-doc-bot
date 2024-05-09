@@ -11,11 +11,23 @@ const start = async () => {
     logger.info('Starting bot server...')
     const bot = new Telegraf(config.get('telegram.botToken'))
 
-    const { domain, path } = getWebhookPath()
+    const { domain, path, url } = getWebhookPath(bot.secretPathComponent())
     const webhook = await bot.createWebhook({
       domain,
       path
     })
+
+    bot.botInfo ??= await bot.telegram.getMe()
+    logger.info(`Starting bot @${bot.botInfo.username}...`)
+
+    const secret = config.get('telegram.webhookSecret')
+    if (config.get('telegram.updateWebhookOnStart')) {
+      logger.info('Updating hook URL...')
+      bot.launch()
+      await bot.telegram.setWebhook(url, {
+        secret_token: secret,
+      })
+    }
 
     const server = Fastify({
       logger: logger as any,
@@ -26,17 +38,23 @@ const start = async () => {
     })
 
     server.post(path, async (req, res) => {
+      const reqToken = req.headers['X-Telegram-Bot-Api-Secret-Token']
+      if (reqToken !== secret) {
+        res.status(400).send({ message: 'Bad Request' })
+        return
+      }
+
       // I hate typescript
       return await webhook(req as any, res.raw)
     })
 
     const { dispose } = await bootstrapService(bot)
-    process.on('exit', dispose)
+    process.on('exit', () => dispose())
 
     const port = config.get('port')
     await server.listen({ port })
     logger.info(`Listening on port ${port}...`)
-    logger.info(`Webhook path is ${path}`)
+    logger.info(`Webhook path is ${url}`)
 
   } catch (err) {
     logger.error(err)
@@ -45,10 +63,6 @@ const start = async () => {
 }
 
 await start()
-
-process.on('exit', (code) => {
-  logger.info(`Server restarting. Code:${code}`)
-});
 
 // this is the signal that nodemon uses
 process.once('SIGUSR2', () => {

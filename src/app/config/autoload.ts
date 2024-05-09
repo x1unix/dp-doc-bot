@@ -19,6 +19,24 @@ convict.addFormats({
       }
       return val
     }
+  },
+  'boolean': {
+    validate: (val: any): void => {
+      return val
+    },
+    coerce: (val: any) => {
+      switch (val.toString().trim()) {
+        case '':
+        case '0':
+        case 'false':
+          return false
+        case '1':
+        case 'true':
+          return true
+        default:
+          throw new Error(`invalid value ${val}`)
+      }
+    }
   }
 })
 
