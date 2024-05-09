@@ -2,16 +2,22 @@ import Fastify from 'fastify'
 import { Telegraf } from 'telegraf'
 
 import { config, getWebhookPath, version } from './app/config/config.ts'
-import { logger, bootstrapLogger } from './app/logger.ts'
+import { logger, Sentry } from './app/logger.ts'
 import { bootstrapService } from './app/app.ts'
-import { retry } from './app/utils.ts'
+import { retry, sleep } from './app/utils.ts'
 
 const start = async () => {
   try {
     config.validate({ allowed: 'strict' })
-    bootstrapLogger()
-    logger.info('Starting bot server...')
+  } catch (err) {
+    console.error(`Invalid config: ${err}`)
+    Sentry.captureException(err)
+    process.exit(1)
+    return
+  }
 
+  try {
+    logger.info('Starting bot server...')
     const bot = new Telegraf(config.get('telegram.botToken'))
     const secret = config.get('telegram.webhookSecret')
     const { domain, path, url } = getWebhookPath(bot.secretPathComponent())
@@ -59,9 +65,17 @@ const start = async () => {
     logger.info(`Webhook path is ${url}`)
 
   } catch (err) {
-    logger.error(err)
+    await logger.error(err)
+    await logger.flush()
+
+    // Sleep to flush sentry spans
+    if (config.get('sentry.dsn')) {
+      await sleep(1000)
+    }
+
     process.exit(1)
   }
+
 }
 
 await start()

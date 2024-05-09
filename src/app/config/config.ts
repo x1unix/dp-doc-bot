@@ -53,27 +53,17 @@ export const config = convict({
       doc: 'Logging level',
       format: 'log-level',
       env: 'LOG_LEVEL',
-      default: 'warn',
+      default: isProduction ? 'warn' : 'debug',
     },
-    file: {
-      doc: 'Log file to write',
+  },
+  sentry: {
+    dsn: {
+      doc: 'Sentry DSN',
       format: '*',
-      env: 'LOG_FILE',
+      env: 'SENTRY_DSN',
       default: '',
     },
-    maxFileSize: {
-      doc: 'Max log file size before rotation',
-      format: 'int',
-      env: 'LOG_MAX_FILE_SIZE',
-      default: 10 * 1024 * 1024,
-    },
-    maxFiles: {
-      doc: 'Max number of rotated files',
-      format: 'int',
-      env: 'LOG_MAX_FILES',
-      default: 2,
-    }
-  }
+  },
 })
 
 export type Config = typeof config

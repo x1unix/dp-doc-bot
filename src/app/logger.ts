@@ -1,47 +1,44 @@
-import { createLogger, transports, format } from 'winston'
+import pino, { type LoggerOptions } from 'pino'
+import { createWriteStream, Severity } from 'pino-sentry'
 
-import { isProduction, config } from './config/config.ts'
+import { config, version } from './config/config.ts'
 
-const transport = new transports.Console({
-  stderrLevels: ['warn', 'error'],
-})
+export { Sentry } from 'pino-sentry'
 
-export const logger = createLogger({
-  level: isProduction ? 'warn' : 'info',
-  // Define levels required by Fastify (by default has verbose level and does not have trace)
-  levels: {
-    fatal: 0,
-    error: 1,
-    warn: 2,
-    info: 3,
-    trace: 4,
-    debug: 5
-  },
-  transports: [
-    transport,
-  ],
-  exceptionHandlers: [
-    transport,
-  ],
-  rejectionHandlers: [
-    transport,
-  ],
-  format: format.combine(
-    format.timestamp(),
-    format.errors({ stack: true }),
-    format.prettyPrint()
-  )
-})
+const bootstrapLogger = () => {
+  const logLevel = config.get('log.level')
 
-export const bootstrapLogger = () => {
-  const logFile = config.get('log.file')
-  if (!logFile) {
-    return
+  const pinoOpts: LoggerOptions = {
+    level: logLevel
   }
 
-  logger.add(new transports.File({
-    filename: logFile,
-    maxsize: config.get('log.maxFileSize'),
-    maxFiles: config.get('log.maxFiles'),
-  }))
+  const sentryDsn = config.get('sentry.dsn')
+  if (!sentryDsn) {
+    return pino(pinoOpts, process.stdout)
+  }
+
+  const stream = createWriteStream({
+    dsn: sentryDsn,
+    release: version,
+    level: 'error',
+    stackAttributeKey: 'err.stack',
+    tracesSampleRate: 1.0, //  Capture 100% of the transactions
+    profilesSampleRate: 1.0,
+    sentryExceptionLevels: [
+      Severity.Critical,
+      Severity.Error,
+      Severity.Fatal,
+    ],
+    decorateScope(data: any, scope) {
+      if (!data.err) {
+        return
+      }
+      const { type, message, stack, ...fields } = data.err
+      scope.setExtra('errorData', fields)
+    },
+  })
+
+  return pino(pinoOpts, pino.multistream([stream, { stream: process.stdout }]))
 }
+
+export const logger = bootstrapLogger()
