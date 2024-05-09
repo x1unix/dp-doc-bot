@@ -2,19 +2,20 @@ import puppeteer, { type Browser, type Page } from 'puppeteer'
 import { parse } from 'date-fns'
 
 import {
+  type RequestId,
   type StatusProvider,
   type DocumentCheckParams,
   type DocumentStatusHandler,
   QueryError,
   ErrorType,
-} from '../types'
-import { type FormParams, type CheckerResponse, DATE_FORMAT, buildFormObject } from './types'
+} from '../types.ts'
+import { type FormParams, type CheckerResponse, DATE_FORMAT, buildFormObject } from './types.ts'
 
 // TS hack
 interface CustomWindow extends Window {
-  __queryStatus__: (r: { id: string, formObject: FormParams, req: DocumentCheckParams }) => Promise<void>
-  __onError__: (id: string, errType: 'internal' | 'http', msg: string) => void
-  __onResult__: (id: string, req: DocumentCheckParams, rsp: CheckerResponse) => void
+  __queryStatus__: (r: { id: RequestId, formObject: FormParams, req: DocumentCheckParams }) => Promise<void>
+  __onError__: (id: RequestId, errType: 'internal' | 'http', msg: string) => void
+  __onResult__: (id: RequestId, req: DocumentCheckParams, rsp: CheckerResponse) => void
 }
 declare var window: CustomWindow
 
@@ -33,7 +34,7 @@ export class BrowserStatusProvider implements StatusProvider {
   private handler?: DocumentStatusHandler
   private pool: Page[] = []
   private vacantPages: number
-  private timeouts = new Map<string, NodeJS.Timeout>()
+  private timeouts = new Map<RequestId, NodeJS.Timeout>()
 
   private constructor(private browser: Browser, maxPoolSize: number) {
     this.vacantPages = maxPoolSize
@@ -43,7 +44,12 @@ export class BrowserStatusProvider implements StatusProvider {
     this.handler = h
   }
 
-  async queryDocumentStatus(reqId: string, p: DocumentCheckParams) {
+  async queryDocumentStatus(reqId: RequestId, p: DocumentCheckParams) {
+    if (this.timeouts.has(reqId)) {
+      this.handler?.handleStatusError(reqId, new QueryError(ErrorType.QuotaError, 'Another request is already in progress'))
+      return
+    }
+
     let page: Page
     try {
       page = await this.requestPage()
@@ -69,7 +75,7 @@ export class BrowserStatusProvider implements StatusProvider {
     }
   }
 
-  private onResult(reqId: string, req: DocumentCheckParams, data: CheckerResponse) {
+  private onResult(reqId: RequestId, req: DocumentCheckParams, data: CheckerResponse) {
     const t = this.timeouts.get(reqId)
     if (t) {
       clearTimeout(t)
@@ -91,7 +97,7 @@ export class BrowserStatusProvider implements StatusProvider {
     })
   }
 
-  private onError(reqId: string, type: 'internal' | 'http', msg: string) {
+  private onError(reqId: RequestId, type: 'internal' | 'http', msg: string) {
     const t = this.timeouts.get(reqId)
     if (t) {
       clearTimeout(t)

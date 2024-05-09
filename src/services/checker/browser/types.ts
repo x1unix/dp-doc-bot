@@ -1,4 +1,4 @@
-import type { StatusCode, DocumentCheckParams } from '../types'
+import type { StatusCode, DocumentCheckParams } from '../types.ts'
 
 export const DATE_FORMAT = 'dd.MM.yyyy'
 

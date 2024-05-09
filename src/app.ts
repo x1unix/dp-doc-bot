@@ -1,33 +1,45 @@
-import Fastify, { type FastifyInstance, type RouteShorthandOptions } from 'fastify'
+import Fastify from 'fastify'
+import { Telegraf } from 'telegraf'
 
-const server: FastifyInstance = Fastify({
-  logger: true
-})
-
-const opts: RouteShorthandOptions = {
-  schema: {
-    response: {
-      200: {
-        type: 'object',
-        properties: {
-          pong: {
-            type: 'string'
-          }
-        }
-      }
-    }
-  }
-}
-
-server.get('/ping', opts, async (request, reply) => {
-  return { pong: 'ok' }
-})
+import { config, getWebhookPath, version } from './app/config/config.ts'
+import { logger } from './app/logger.ts'
+import { bootstrapService } from './app/app.ts'
 
 const start = async () => {
   try {
-    await server.listen({ port: 3000 })
+    config.validate({ allowed: 'strict' })
+    logger.info('Starting bot server...')
+    const bot = new Telegraf(config.get('telegram.botToken'))
+
+    const { domain, path } = getWebhookPath()
+    const webhook = await bot.createWebhook({
+      domain,
+      path
+    })
+
+    const server = Fastify({
+      logger: logger as any,
+    })
+
+    server.get('/ping', async (request, reply) => {
+      return { ok: true, version }
+    })
+
+    server.post(path, async (req, res) => {
+      // I hate typescript
+      return await webhook(req as any, res.raw)
+    })
+
+    const { dispose } = await bootstrapService(bot)
+    process.on('exit', dispose)
+
+    const port = config.get('port')
+    await server.listen({ port })
+    logger.info(`Listening on port ${port}...`)
+    logger.info(`Webhook path is ${path}`)
+
   } catch (err) {
-    server.log.error(err)
+    logger.error(err)
     process.exit(1)
   }
 }
@@ -35,11 +47,11 @@ const start = async () => {
 await start()
 
 process.on('exit', (code) => {
-  server.log.info(`Server restarting. Code:${code}`)
+  logger.info(`Server restarting. Code:${code}`)
 });
 
 // this is the signal that nodemon uses
 process.once('SIGUSR2', () => {
-  server.log.info('Server restarting')
+  logger.info('Server restarting')
   process.kill(process.pid, 'SIGUSR2')
 });

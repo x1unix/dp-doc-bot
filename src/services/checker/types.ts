@@ -4,6 +4,8 @@ export enum StatusCode {
   Ready = 24,       // Готовий до видачі, приїхав
 }
 
+export type RequestId = number
+
 export interface DocumentCheckParams {
   /**
    * Document series. Usually first two letters of a legacy passport.
@@ -54,6 +56,20 @@ export class QueryError extends Error {
   constructor(public type: ErrorType, public message: string) {
     super(message)
   }
+
+  /**
+   * Explicitly converts error to QueryError, if error is not QueryError.
+   *
+   * @param err
+   * @returns
+   */
+  static from(err: any): QueryError {
+    if (err instanceof QueryError) {
+      return err
+    }
+
+    return new QueryError(ErrorType.CrawlError, err.message ?? err.toString())
+  }
 }
 
 export interface DocumentStatusHandler {
@@ -63,7 +79,7 @@ export interface DocumentStatusHandler {
    * @param reqId Request ID.
    * @param s Status, if no error occured.
    */
-  handleStatusResult(reqId: string, s: DocumentStatus)
+  handleStatusResult(reqId: RequestId, s: DocumentStatus)
 
   /**
    * Handles document query error.
@@ -71,7 +87,7 @@ export interface DocumentStatusHandler {
    * @param reqId Request ID.
    * @param err
    */
-  handleStatusError(reqId: string, err: QueryError)
+  handleStatusError(reqId: RequestId, err: QueryError)
 }
 
 export interface StatusProvider {
@@ -88,7 +104,7 @@ export interface StatusProvider {
    * @param reqId Request ID.
    * @param p Request params
    */
-  queryDocumentStatus(reqId: string, p: DocumentCheckParams): Promise<void>
+  queryDocumentStatus(reqId: RequestId, p: DocumentCheckParams): Promise<void>
 
   /**
    * Free all allocated resources.

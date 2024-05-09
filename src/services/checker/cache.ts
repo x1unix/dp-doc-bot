@@ -1,5 +1,5 @@
 import { differenceInMilliseconds } from 'date-fns'
-import type { DocumentCheckParams, DocumentStatusHandler, StatusProvider, DocumentStatus, QueryError } from './types';
+import type { RequestId, DocumentCheckParams, DocumentStatusHandler, StatusProvider, DocumentStatus, QueryError } from './types.ts'
 
 interface CacheEntry {
   createdAt: Date
@@ -21,7 +21,7 @@ export class StatusCacheMiddleware implements StatusProvider, DocumentStatusHand
     this.scheduleCleanup()
   }
 
-  queryDocumentStatus(reqId: string, p: DocumentCheckParams): Promise<void> {
+  queryDocumentStatus(reqId: RequestId, p: DocumentCheckParams): Promise<void> {
     const cached = this.getFromCache(p)
     if (cached) {
       this.handler.handleStatusResult(reqId, cached)
@@ -45,7 +45,7 @@ export class StatusCacheMiddleware implements StatusProvider, DocumentStatusHand
     return await this.provider.dispose()
   }
 
-  handleStatusResult(reqId: string, s: DocumentStatus) {
+  handleStatusResult(reqId: RequestId, s: DocumentStatus) {
     const key = this.getCacheKey(s.request)
     this.cache.set(key, {
       createdAt: new Date(),
@@ -55,7 +55,7 @@ export class StatusCacheMiddleware implements StatusProvider, DocumentStatusHand
     this.handler?.handleStatusResult(reqId, s)
   }
 
-  handleStatusError(reqId: string, err: QueryError) {
+  handleStatusError(reqId: RequestId, err: QueryError) {
     this.handler?.handleStatusError(reqId, err)
   }
 

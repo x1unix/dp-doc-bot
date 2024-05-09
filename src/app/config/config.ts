@@ -1,0 +1,61 @@
+import convict from 'convict'
+
+import { autoload } from './autoload.ts'
+
+autoload()
+
+const { NODE_ENV = 'dev', APP_VERSION = '1.0.0', ENV } = process.env
+
+export const isProduction = NODE_ENV.startsWith('prod')
+export const version = APP_VERSION
+
+export const config = convict({
+  env: {
+    doc: 'Application environment',
+    format: ['prod', 'production', 'dev', 'development', 'test'],
+    default: 'dev',
+    env: 'NODE_ENV',
+  },
+  port: {
+    doc: 'HTTP port address',
+    format: 'port',
+    default: 8080,
+    env: 'HTTP_PORT',
+  },
+  baseUrl: {
+    doc: 'Base URL for webhook',
+    format: 'url',
+    env: 'HTTP_BASE_URL',
+    default: null,
+  },
+  telegram: {
+    botToken: {
+      doc: 'Bot token',
+      format: 'required-string',
+      env: 'TELEGRAM_BOT_TOKEN',
+      default: null,
+    },
+    webhookSecret: {
+      doc: 'Bot secret for Telegram',
+      format: 'required-string',
+      env: 'BOT_WEBHOOK_SECRET',
+      default: null,
+    }
+  }
+})
+
+export const getWebhookPath = () => {
+  const url = new URL(config.get('baseUrl'))
+  if (!url.pathname.endsWith('/')) {
+    // Normalize URL path
+    url.pathname += '/'
+  }
+
+  const secret = config.get('telegram.webhookSecret')
+  const hookPath = `${url.pathname}/${secret}`
+
+  return { domain: url.host, path: hookPath }
+}
+
+export type Config = typeof config
+
