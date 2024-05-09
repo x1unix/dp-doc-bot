@@ -34,7 +34,7 @@ const bootstrapLogger = () => {
         return
       }
       const { type, message, stack, ...fields } = data.err
-      scope.setExtra('errorData', fields)
+      scope.setExtra('errorContext', fields)
     },
   })
 
