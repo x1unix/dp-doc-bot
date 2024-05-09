@@ -40,9 +40,9 @@ const start = async () => {
     })
 
     server.post(path, async (req, res) => {
-      const reqToken = req.headers['X-Telegram-Bot-Api-Secret-Token']
+      const reqToken = req.headers['x-telegram-bot-api-secret-token']
       if (reqToken !== secret) {
-        res.status(400).send({ message: 'Bad Request' })
+        res.status(404).send({ message: 'Not Found' })
         return
       }
 
