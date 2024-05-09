@@ -1,6 +1,6 @@
 import { createLogger, transports, format } from 'winston'
 
-import { isProduction } from './config/config.ts'
+import { isProduction, config } from './config/config.ts'
 
 const transport = new transports.Console({
   stderrLevels: ['warn', 'error'],
@@ -32,3 +32,16 @@ export const logger = createLogger({
     format.prettyPrint()
   )
 })
+
+export const bootstrapLogger = () => {
+  const logFile = config.get('log.file')
+  if (!logFile) {
+    return
+  }
+
+  logger.add(new transports.File({
+    filename: logFile,
+    maxsize: config.get('log.maxFileSize'),
+    maxFiles: config.get('log.maxFiles'),
+  }))
+}

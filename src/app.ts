@@ -2,12 +2,13 @@ import Fastify from 'fastify'
 import { Telegraf } from 'telegraf'
 
 import { config, getWebhookPath, version } from './app/config/config.ts'
-import { logger } from './app/logger.ts'
+import { logger, bootstrapLogger } from './app/logger.ts'
 import { bootstrapService } from './app/app.ts'
 
 const start = async () => {
   try {
     config.validate({ allowed: 'strict' })
+    bootstrapLogger()
     logger.info('Starting bot server...')
     const bot = new Telegraf(config.get('telegram.botToken'))
 
@@ -30,7 +31,7 @@ const start = async () => {
     }
 
     const server = Fastify({
-      logger: logger as any,
+      logger: false,
     })
 
     server.get('/ping', async (request, reply) => {

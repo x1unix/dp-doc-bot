@@ -47,6 +47,32 @@ export const config = convict({
       env: 'BOT_UPDATE_WEBHOOK_ON_BOOT',
       default: false,
     }
+  },
+  log: {
+    level: {
+      doc: 'Logging level',
+      format: 'log-level',
+      env: 'LOG_LEVEL',
+      default: 'warn',
+    },
+    file: {
+      doc: 'Log file to write',
+      format: '*',
+      env: 'LOG_FILE',
+      default: '',
+    },
+    maxFileSize: {
+      doc: 'Max log file size before rotation',
+      format: 'int',
+      env: 'LOG_MAX_FILE_SIZE',
+      default: 10 * 1024 * 1024,
+    },
+    maxFiles: {
+      doc: 'Max number of rotated files',
+      format: 'int',
+      env: 'LOG_MAX_FILES',
+      default: 2,
+    }
   }
 })
 

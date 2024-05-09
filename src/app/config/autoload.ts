@@ -5,6 +5,8 @@ import validators from 'convict-format-with-validator'
 
 const { NODE_ENV = '' } = process.env
 
+const logLevels = new Set(['info', 'warn', 'error', 'debug', 'trace'])
+
 convict.addFormats(validators)
 convict.addFormats({
   'required-string': {
@@ -35,6 +37,13 @@ convict.addFormats({
           return true
         default:
           throw new Error(`invalid value ${val}`)
+      }
+    }
+  },
+  'log-level': {
+    validate: (val: any): void => {
+      if (!logLevels.has(val.toString())) {
+        throw new Error(`Invalid log level "${val}". Supported values: ${Array.from(logLevels).join(', ')}`)
       }
     }
   }
