@@ -4,14 +4,16 @@ import { Telegraf } from 'telegraf'
 import { config, getWebhookPath, version } from './app/config/config.ts'
 import { logger, bootstrapLogger } from './app/logger.ts'
 import { bootstrapService } from './app/app.ts'
+import { retry } from './app/utils.ts'
 
 const start = async () => {
   try {
     config.validate({ allowed: 'strict' })
     bootstrapLogger()
     logger.info('Starting bot server...')
-    const bot = new Telegraf(config.get('telegram.botToken'))
 
+    const bot = new Telegraf(config.get('telegram.botToken'))
+    const secret = config.get('telegram.webhookSecret')
     const { domain, path, url } = getWebhookPath(bot.secretPathComponent())
     const webhook = await bot.createWebhook({
       domain,
@@ -21,13 +23,12 @@ const start = async () => {
     bot.botInfo ??= await bot.telegram.getMe()
     logger.info(`Starting bot @${bot.botInfo.username}...`)
 
-    const secret = config.get('telegram.webhookSecret')
+    // Fails on first run and needs retry after 1s.
     if (config.get('telegram.updateWebhookOnStart')) {
       logger.info('Updating hook URL...')
-      bot.launch()
-      await bot.telegram.setWebhook(url, {
+      await retry(3)(() => bot.telegram.setWebhook(url, {
         secret_token: secret,
-      })
+      }))
     }
 
     const server = Fastify({
