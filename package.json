@@ -1,0 +1,30 @@
+{
+  "name": "dp-doc-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "swc src --out-dir dist/src",
+    "build:ci": "tsc && npm run build:dev",
+    "build:watch": "swc src -w --out-dir dist/src",
+    "start:dev": "concurrently \"npm run build:watch\" \"nodemon --watch 'dist/**/*.js' -e js dist/src/app.js\""
+  },
+  "author": "sdm95",
+  "license": "proprietary",
+  "dependencies": {
+    "date-fns": "^3.6.0",
+    "fastify": "^4.27.0",
+    "puppeteer": "^22.8.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@swc/plugin-transform-imports": "^2.0.3",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.0",
+    "swc": "^1.0.11",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=20.6"
+  }
+}
