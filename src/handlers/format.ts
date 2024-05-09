@@ -26,7 +26,7 @@ export const formatError = (err: any) => {
       break
   }
 
-  return msg + '`' + qe.message + '`' + INTERNAL_ERR_SUFFIX
+  return msg + '\n\n<code>' + qe.message + '</code>' + INTERNAL_ERR_SUFFIX
 }
 
 export const formatResult = ({ code, message, updatedAt, request }: DocumentStatus) => {
@@ -69,8 +69,9 @@ export const formatResult = ({ code, message, updatedAt, request }: DocumentStat
   }
 
   const dateFmt = format(updatedAt, 'do MMMM yyyy', { locale: uk })
-  msg = `\n\nВідповідь від ДП Документ:\n${message}` +
-    '\n\n*Зверніть увагу, що відповідь може відрізнятись від реального статусу.*\n\n' +
-    `🕒 Дата оновлення статусу: ${dateFmt} (${diffStr})`
+  msg = `\n\n<b>Відповідь від ДП Документ:</b>\n${message}` +
+    `🕒 Дата оновлення статусу: ${dateFmt} (${diffStr})` +
+    '\n\n<i>Зверніть увагу, що відповідь від ДП Документ може відрізнятись від реального статусу вашого документу.</i>\n\n'
+
   return msg
 }

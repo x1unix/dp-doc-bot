@@ -53,7 +53,7 @@ export class CheckerHandler implements DocumentStatusHandler {
   async handleStatusResult(reqId: number, s: DocumentStatus) {
     try {
       const msg = formatResult(s)
-      await this.bot.telegram.sendMessage(reqId, msg)
+      await this.bot.telegram.sendMessage(reqId, msg, { parse_mode: 'HTML' })
     } catch (err) {
       logger.error(err)
     }
@@ -67,6 +67,7 @@ export class CheckerHandler implements DocumentStatusHandler {
     }
 
     const msg = formatError(err)
-    this.bot.telegram.sendMessage(id, msg).catch(err => logger.error(`Failed to send reply: ${err}`))
+    this.bot.telegram.sendMessage(id, msg, { parse_mode: 'HTML' })
+    .catch(err => logger.error(`Failed to send reply: ${err}`))
   }
 }
