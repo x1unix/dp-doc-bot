@@ -47,9 +47,9 @@ export interface DocumentStatus {
 export enum ErrorType {
   QuotaError = 1,
   CrawlError = 2,
-  HttpError = 4,
-  ApiError = 5,
-  TimeoutError = 6,
+  HttpError = 3,
+  ApiError = 4,
+  TimeoutError = 5,
 }
 
 export class QueryError extends Error {

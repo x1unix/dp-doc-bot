@@ -144,7 +144,11 @@ export class BrowserStatusProvider implements StatusProvider {
 
     logger.debug('Spawning a new page')
     try {
-      await page.goto(PAGE_URL, { waitUntil: 'domcontentloaded' })
+      const rsp = await page.goto(PAGE_URL, { waitUntil: 'domcontentloaded' })
+      if (!rsp.ok()) {
+        throw new QueryError(ErrorType.HttpError, `${rsp.status} ${rsp.statusText}`)
+      }
+
       await page.waitForSelector('form[data-jtoken]', { timeout: 10000 })
       await page.exposeFunction('__onResult__', (reqId, req, rsp) => this.onResult(reqId, req, rsp))
       await page.exposeFunction('__onError__', (reqId, t, err) => this.onError(reqId, t, err))
