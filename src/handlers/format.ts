@@ -48,7 +48,7 @@ export const formatResult = ({ code, message, updatedAt, request }: DocumentStat
       break
   }
 
-  const diffDays = differenceInCalendarDays(updatedAt, now)
+  const diffDays = differenceInCalendarDays(now, updatedAt)
   let diffStr: string
 
   switch (diffDays) {
