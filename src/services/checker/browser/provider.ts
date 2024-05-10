@@ -125,13 +125,14 @@ export class BrowserStatusProvider implements StatusProvider {
     }
 
     let page = this.pool.pop()
-    if (page && !page.isClosed) {
+    if (page && !page.isClosed()) {
       logger.debug('reusing existing page instance')
       this.vacantPages--
       return page
     }
 
     // Page not created yet
+    logger.debug
     page = await this.createPage()
     this.vacantPages--
     return page
