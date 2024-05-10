@@ -17,6 +17,6 @@ export const bootstrapService = async (
   bot.on('message', (ctx) => checkHandler.handleMessage(ctx))
 
   return {
-    dispose: () => checkerSvc.dispose()
+    dispose: async () => checkerSvc.dispose()
   }
 }

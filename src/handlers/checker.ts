@@ -44,6 +44,7 @@ export class CheckerHandler implements DocumentStatusHandler {
     }
 
     try {
+      ctx.reply('🔍 Шукаю інформацію, зачекайте будь-ласка...')
       await this.checker.queryDocumentStatus(ctx.msg.chat.id, params)
     } catch (err: any) {
       this.handleStatusError(ctx.msg.chat.id, QueryError.from(err))
@@ -68,6 +69,6 @@ export class CheckerHandler implements DocumentStatusHandler {
 
     const msg = formatError(err)
     this.bot.telegram.sendMessage(id, msg, { parse_mode: 'HTML' })
-    .catch(err => logger.error(`Failed to send reply: ${err}`))
+      .catch(err => logger.error(`Failed to send reply: ${err}`))
   }
 }

@@ -34,7 +34,7 @@ export class StatusCheckerService {
     return await this.statusProvider.queryDocumentStatus(reqId, p)
   }
 
-  dispose() {
-    this.statusProvider.dispose()
+  async dispose() {
+    return await this.statusProvider.dispose()
   }
 }

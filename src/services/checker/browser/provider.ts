@@ -9,6 +9,7 @@ import {
   QueryError,
   ErrorType,
 } from '../types.ts'
+import { logger } from '../../../app/logger.ts'
 import { type FormParams, type CheckerResponse, DATE_FORMAT, buildFormObject } from './types.ts'
 
 // TS hack
@@ -45,6 +46,7 @@ export class BrowserStatusProvider implements StatusProvider {
   }
 
   async queryDocumentStatus(reqId: RequestId, p: DocumentCheckParams) {
+    logger.info(p, 'Got document query request')
     if (this.timeouts.has(reqId)) {
       this.handler?.handleStatusError(reqId, new QueryError(ErrorType.QuotaError, 'Another request is already in progress'))
       return
@@ -137,9 +139,10 @@ export class BrowserStatusProvider implements StatusProvider {
     const page = await this.browser.newPage()
     page.setUserAgent(UA)
 
+    logger.debug('Spawning a new page')
     try {
       await page.goto(PAGE_URL, { waitUntil: 'domcontentloaded' })
-      await page.waitForSelector('form[data-jtoken')
+      await page.waitForSelector('form[data-jtoken]', { timeout: 10000 })
       await page.exposeFunction('__onResult__', (reqId, req, rsp) => this.onResult(reqId, req, rsp))
       await page.exposeFunction('__onError__', (reqId, t, err) => this.onError(reqId, t, err))
       await page.evaluate(() => {

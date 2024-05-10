@@ -57,7 +57,7 @@ const start = async () => {
     })
 
     const { dispose } = await bootstrapService(bot)
-    process.on('exit', () => dispose())
+    process.on('exit', async () => await dispose())
 
     const port = config.get('port')
     await server.listen({ port })
