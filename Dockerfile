@@ -22,7 +22,7 @@ RUN apk add --no-cache  \
 WORKDIR /opt/bot
 COPY --from=builder /tmp/work/dist /opt/bot/dist
 COPY --from=builder /tmp/work/node_modules /opt/bot/node_modules
-COPY --from=builder package.json package-lock.json tsconfig.json /opt/bot/
+COPY --from=builder /tmp/work/package.json /tmp/work/package-lock.json /tmp/work/tsconfig.json /opt/bot/
 
 EXPOSE 8080
 
