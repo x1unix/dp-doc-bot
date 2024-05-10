@@ -4,7 +4,7 @@
 
 Бот для перевірки статусу документів на сайті ДП Документ.
 
-[![@dp_check_bot](https://img.shields.io/badge/%40dp_check_bot-0088CC?logo=telegram&logoColor=%23fff)](https://t.me/dp_check_bot)
+[![@dp_check_bot](https://img.shields.io/badge/%40dp__check__bot-0088CC?logo=telegram&logoColor=%23fff)](https://t.me/dp_check_bot)
 
 ## Development
 
