@@ -75,7 +75,7 @@ export const formatResult = ({ code, message, rawStatusDate, updatedAt, request 
   try {
     dateFmt = format(updatedAt, 'do MMMM yyyy', { locale: uk })
   } catch (err) {
-    logger.error(`Weird date in response - ${err} (value: ${rawStatusDate})`)
+    logger.warn(`Weird date in response - ${err} (value: ${rawStatusDate})`)
     dateFmt = rawStatusDate
   }
 
