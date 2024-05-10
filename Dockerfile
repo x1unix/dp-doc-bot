@@ -11,6 +11,7 @@ ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
 ENV NODE_ENV=production
 ENV HTTP_PORT=8080
+ENV CHROME_PATH=/usr/bin/chromium
 
 RUN apk add --no-cache  \
     tzdata \
@@ -23,11 +24,19 @@ RUN apk add --no-cache  \
     ttf-freefont \
     chromium
 
+RUN adduser -D -u 1000 bot && \
+    mkdir /opt/bot && \
+    chown bot:bot /opt/bot
+
+USER bot
+
 WORKDIR /opt/bot
-COPY --from=builder /tmp/work/dist /opt/bot/dist
-COPY --from=builder /tmp/work/node_modules /opt/bot/node_modules
-COPY --from=builder /tmp/work/package.json /tmp/work/package-lock.json /tmp/work/tsconfig.json /opt/bot/
-RUN npx puppeteer browsers install chrome
+COPY --from=builder --chown=bot:bot /tmp/work/dist /opt/bot/dist
+COPY --from=builder --chown=bot:bot /tmp/work/node_modules /opt/bot/node_modules
+COPY --from=builder --chown=bot:bot /tmp/work/package.json /tmp/work/package-lock.json /tmp/work/tsconfig.json /opt/bot/
+
+# Doesn't work on Alpine containers
+# RUN npx puppeteer browsers install chrome
 
 EXPOSE 8080
 

@@ -30,6 +30,7 @@ const UA =
 export interface BrowserProviderConfig {
   maxPoolSize: number
   headless?: boolean
+  chromePath?: string
   chromeArgs?: string[]
 }
 
@@ -204,10 +205,11 @@ export class BrowserStatusProvider implements StatusProvider {
     }
   }
 
-  static async create({ maxPoolSize, headless = true, chromeArgs = CHROME_ARGS }) {
+  static async create({ maxPoolSize, headless = true, chromePath, chromeArgs = CHROME_ARGS }) {
     logger.info({ headless, maxPoolSize, chromeArgs }, 'Starting Chrome browser...')
     const browser = await puppeteer.launch({
       headless,
+      executablePath: chromePath,
       args: chromeArgs
     })
 

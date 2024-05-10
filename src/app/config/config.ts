@@ -71,6 +71,12 @@ export const config = convict({
       env: 'CHROME_HEADLESS',
       default: true,
     },
+    path: {
+      doc: 'Path to Google Chrome installation',
+      format: '*',
+      env: 'CHROME_PATH',
+      default: undefined,
+    },
     args: {
       doc: 'Chrome launch command line args',
       format: 'cmd',
