@@ -1,5 +1,6 @@
 import puppeteer, { type Browser, type Page } from 'puppeteer'
 import { parse } from 'date-fns'
+import { STATUS_CODES } from 'http'
 
 import {
   type RequestId,
@@ -146,7 +147,11 @@ export class BrowserStatusProvider implements StatusProvider {
     try {
       const rsp = await page.goto(PAGE_URL, { waitUntil: 'domcontentloaded' })
       if (!rsp.ok()) {
-        throw new QueryError(ErrorType.HttpError, `${rsp.status} ${rsp.statusText}`)
+        const status = rsp.status()
+
+        // Puppeteer sometimes return empty value
+        const statusText = rsp.statusText() || STATUS_CODES[status]
+        throw new QueryError(ErrorType.HttpError, `${status} ${statusText}`)
       }
 
       await page.waitForSelector('form[data-jtoken]', { timeout: 10000 })
