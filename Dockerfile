@@ -11,7 +11,6 @@ ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
 ENV NODE_ENV=production
 ENV HTTP_PORT=8080
-ENV CHROME_PATH=/usr/bin/chromium
 
 RUN apk add --no-cache  \
     tzdata \
@@ -28,6 +27,7 @@ WORKDIR /opt/bot
 COPY --from=builder /tmp/work/dist /opt/bot/dist
 COPY --from=builder /tmp/work/node_modules /opt/bot/node_modules
 COPY --from=builder /tmp/work/package.json /tmp/work/package-lock.json /tmp/work/tsconfig.json /opt/bot/
+RUN npx puppeteer browsers install chrome
 
 EXPOSE 8080
 
