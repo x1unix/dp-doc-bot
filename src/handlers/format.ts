@@ -2,7 +2,7 @@ import { format, differenceInCalendarDays } from 'date-fns'
 import { uk } from 'date-fns/locale/uk'
 
 import { logger } from '../app/logger.ts'
-import { ErrorType, QueryError, type DocumentStatus, StatusCode } from 'src/services/checker/types.ts'
+import { ErrorType, QueryError, type DocumentStatus, StatusCode } from '../services/checker/types.ts'
 
 const DP_DOC_URL = 'https://pasport.org.ua/solutions/checker'
 const INTERNAL_ERR_SUFFIX = '\n\nПропоную вам поки в ручному режимі перевірити статус документу на сторінці ДП Документ:\n' +

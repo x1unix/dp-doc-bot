@@ -1,6 +1,6 @@
 import type { Telegraf } from 'telegraf'
 
-import { StatusCheckerService } from 'src/services/checker/service.ts'
+import { StatusCheckerService } from '../services/checker/service.ts'
 import { startHandler, CheckerHandler } from '../handlers/handlers.ts'
 
 export const bootstrapService = async (

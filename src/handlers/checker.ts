@@ -1,8 +1,15 @@
 import type { Context, Telegraf } from 'telegraf'
 
 import { logger } from '../app/logger.ts'
-import { StatusCheckerService } from 'src/services/checker/service.ts'
-import { ErrorType, QueryError, type DocumentStatusHandler, type DocumentCheckParams, type RequestId, type DocumentStatus } from 'src/services/checker/types.ts'
+import { StatusCheckerService } from '../services/checker/service.ts'
+import {
+  ErrorType,
+  QueryError,
+  type DocumentStatusHandler,
+  type DocumentCheckParams,
+  type RequestId,
+  type DocumentStatus
+} from '../services/checker/types.ts'
 
 import { formatError, formatResult } from './format.ts'
 
