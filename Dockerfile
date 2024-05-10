@@ -11,13 +11,18 @@ ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
 ENV NODE_ENV=production
 ENV HTTP_PORT=8080
+ENV CHROME_PATH=/usr/bin/chromium
 
 RUN apk add --no-cache  \
     tzdata \
     ca-certificates \
     curl \
     openssl \
-    bash
+    bash \
+    xvfb \
+    udev \
+    ttf-freefont \
+    chromium
 
 WORKDIR /opt/bot
 COPY --from=builder /tmp/work/dist /opt/bot/dist
