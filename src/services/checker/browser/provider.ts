@@ -17,7 +17,7 @@ import { type FormParams, type CheckerResponse, DATE_FORMAT, buildFormObject } f
 interface CustomWindow extends Window {
   __queryStatus__: (r: { id: RequestId, formObject: FormParams, req: DocumentCheckParams }) => Promise<void>
   __onError__: (id: RequestId, errType: 'internal' | 'http', msg: string) => void
-  __onResult__: (id: RequestId, req: DocumentCheckParams, rsp: CheckerResponse) => void
+  __onResult__: (id: RequestId, req: DocumentCheckParams, rsp: CheckerResponse | null) => void
 }
 declare var window: CustomWindow
 
@@ -85,7 +85,7 @@ export class BrowserStatusProvider implements StatusProvider {
     }
   }
 
-  private onResult(reqId: RequestId, req: DocumentCheckParams, data: CheckerResponse) {
+  private onResult(reqId: RequestId, req: DocumentCheckParams, data: CheckerResponse | null) {
     logger.debug({ reqId, req }, 'Got document check result')
     const t = this.timeouts.get(reqId)
     if (t) {
@@ -93,7 +93,18 @@ export class BrowserStatusProvider implements StatusProvider {
       this.timeouts.delete(reqId)
     }
 
+    // Sometimes, server might return 'null' or weird response under heavy load.
+    if (!data) {
+      this.handler?.handleStatusError(reqId, new QueryError(ErrorType.HttpError, 'Server returned a "null" response.'))
+      return
+    }
+
     const meta = data['0']
+    if (!meta) {
+      const errorString = [data.send_status_msg, data.msg].filter(v => !!v?.length).join('\n')
+      this.handler?.handleStatusError(reqId, new QueryError(ErrorType.ApiError, errorString))
+    }
+
     if (meta.errorCode > 0) {
       this.handler?.handleStatusError(reqId, new QueryError(ErrorType.ApiError, data.send_status_msg))
       return

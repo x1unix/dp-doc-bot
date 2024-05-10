@@ -28,6 +28,7 @@ export interface FormParams {
 export interface CheckerResponse extends FormParams {
   "0": StatusInfo
   status: number
+  msg?: string
   send_status_msg: string
   docType: string
   docSeries: string
