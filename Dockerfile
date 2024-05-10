@@ -11,6 +11,7 @@ ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
 ENV NODE_ENV=production
 ENV HTTP_PORT=8080
+ENV HTTP_HOST=0.0.0.0
 ENV CHROME_PATH=/usr/bin/chromium
 
 RUN apk add --no-cache  \
