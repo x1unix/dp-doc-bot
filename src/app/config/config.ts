@@ -16,11 +16,19 @@ export const config = convict({
     default: 'dev',
     env: 'NODE_ENV',
   },
-  port: {
-    doc: 'HTTP port address',
-    format: 'port',
-    default: 8080,
-    env: 'HTTP_PORT',
+  http: {
+    port: {
+      doc: 'HTTP port address',
+      format: 'port',
+      default: 8080,
+      env: 'HTTP_PORT',
+    },
+    host: {
+      doc: 'HTTP host to listen',
+      format: '*',
+      default: '127.0.0.1',
+      env: 'HTTP_HOST',
+    }
   },
   baseUrl: {
     doc: 'Base URL for webhook',

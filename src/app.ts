@@ -59,9 +59,10 @@ const start = async () => {
     const { dispose } = await bootstrapService(bot)
     process.on('exit', async () => await dispose())
 
-    const port = config.get('port')
-    await server.listen({ port })
-    logger.info(`Listening on port ${port}...`)
+    const port = config.get('http.port')
+    const host = config.get('http.host')
+    await server.listen({ port, host })
+    logger.info(`Listening on  ${host}:${port}...`)
     logger.info(`Webhook path is ${url}`)
 
   } catch (err) {
