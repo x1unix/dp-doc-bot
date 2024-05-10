@@ -4,7 +4,7 @@ import { autoload } from './autoload.ts'
 
 autoload()
 
-const { NODE_ENV = 'dev', APP_VERSION = '1.0.0', ENV } = process.env
+const { NODE_ENV = 'dev', APP_VERSION = '1.0.0' } = process.env
 
 export const isProduction = NODE_ENV.startsWith('prod')
 export const version = APP_VERSION
