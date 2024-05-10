@@ -96,6 +96,7 @@ export class BrowserStatusProvider implements StatusProvider {
     const date = parse(meta.statusDate, DATE_FORMAT, new Date())
     this.handler?.handleStatusResult(reqId, {
       updatedAt: date,
+      rawStatusDate: meta.statusDate,
       code: meta.status,
       message: data.send_status_msg,
       request: req,

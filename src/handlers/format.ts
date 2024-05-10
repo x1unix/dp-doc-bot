@@ -32,7 +32,7 @@ export const formatError = (err: any) => {
   return msg + '\n\n<code>' + qe.message + '</code>' + INTERNAL_ERR_SUFFIX
 }
 
-export const formatResult = ({ code, message, updatedAt, request }: DocumentStatus) => {
+export const formatResult = ({ code, message, rawStatusDate, updatedAt, request }: DocumentStatus) => {
   const now = new Date()
   const docId = request.series ? `${request.series}${request.number}` : request.number
   let msg: string
@@ -75,8 +75,8 @@ export const formatResult = ({ code, message, updatedAt, request }: DocumentStat
   try {
     dateFmt = format(updatedAt, 'do MMMM yyyy', { locale: uk })
   } catch (err) {
-    logger.error(`Weird date in response - ${err} (value: ${updatedAt})`)
-    dateFmt = 'невідомо'
+    logger.error(`Weird date in response - ${err} (value: ${rawStatusDate})`)
+    dateFmt = rawStatusDate
   }
 
   msg += `\n\nВідповідь від ДП Документ:\n<i>${message}</i>\n\n` +

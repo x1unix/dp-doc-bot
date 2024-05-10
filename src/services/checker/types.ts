@@ -25,6 +25,12 @@ export interface DocumentStatus {
   updatedAt: Date
 
   /**
+   *
+   * Original date (unformatted)
+   */
+  rawStatusDate: string
+
+  /**
    * Internal status code.
    *
    * More descriptive, as message might be misleading.
