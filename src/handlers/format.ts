@@ -1,3 +1,4 @@
+import sanitizeHtml from 'sanitize-html'
 import { format, differenceInCalendarDays } from 'date-fns'
 import { uk } from 'date-fns/locale/uk'
 
@@ -76,10 +77,14 @@ export const formatResult = ({ code, message, rawStatusDate, updatedAt, request 
     dateFmt = format(updatedAt, 'do MMMM yyyy', { locale: uk })
   } catch (err) {
     logger.warn(`Weird date in response - ${err} (value: ${rawStatusDate})`)
-    dateFmt = rawStatusDate
+    dateFmt = rawStatusDate || 'не відомо'
   }
 
-  msg += `\n\nВідповідь від ДП Документ на сайті:\n<i>${message}</i>\n\n` +
+  const strippedMessage = sanitizeHtml(message, {
+    allowedTags: []
+  })
+
+  msg += `\n\nВідповідь від ДП Документ на сайті:\n<i>${strippedMessage}</i>\n\n` +
     `🕒 Дата оновлення статусу: ${dateFmt} (${diffStr})` +
     '\n\n<i>Зверніть увагу, що відповідь від ДП Документ може відрізнятись від реального статусу вашого документу.</i>\n\n'
 

@@ -24,6 +24,7 @@
     "pino-pretty": "^11.0.0",
     "pino-sentry": "^0.14.1",
     "puppeteer": "^22.8.0",
+    "sanitize-html": "^2.13.0",
     "telegraf": "^4.16.3",
     "typegram": "^5.2.0",
     "uuid": "^9.0.1"
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@swc/plugin-transform-imports": "^2.0.3",
     "@types/convict": "^6.1.6",
+    "@types/sanitize-html": "^2.11.0",
     "concurrently": "^8.2.2",
     "nodemon": "^3.1.0",
     "swc": "^1.0.11",
