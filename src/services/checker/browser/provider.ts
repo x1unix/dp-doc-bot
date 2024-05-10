@@ -102,7 +102,7 @@ export class BrowserStatusProvider implements StatusProvider {
     const meta = data['0']
     if (!meta) {
       const errorString = [data.send_status_msg, data.msg].filter(v => !!v?.length).join('\n')
-      this.handler?.handleStatusError(reqId, new QueryError(ErrorType.ApiError, errorString))
+      this.handler?.handleStatusError(reqId, new QueryError(ErrorType.HttpError, errorString))
     }
 
     if (meta.errorCode > 0) {
