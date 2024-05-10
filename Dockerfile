@@ -2,10 +2,9 @@ ARG APP_VERSION=1.0.0
 
 FROM node:20-alpine3.19 as builder
 ARG APP_VERSION
-ENV NODE_ENV=production
 WORKDIR /tmp/work
 COPY . ./
-RUN npm install && npm run build
+RUN npm install --include=dev && npm run build
 
 FROM node:20-alpine3.19
 ARG APP_VERSION
