@@ -7,7 +7,7 @@ WORKDIR /tmp/work
 COPY . ./
 RUN npm install && npm run build
 
-FROM node:20-alpine:3.19
+FROM node:20-alpine3.19
 ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
 ENV NODE_ENV=production
