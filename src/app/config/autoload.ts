@@ -40,6 +40,18 @@ convict.addFormats({
       }
     }
   },
+  'cmd': {
+    validate: (val: any): void => {
+      return val
+    },
+    coerce: (val: any) => {
+      if (!val) {
+        return []
+      }
+
+      return val.toString().split(' ').map(v => v.trim())
+    }
+  },
   'log-level': {
     validate: (val: any): void => {
       if (!logLevels.has(val.toString())) {

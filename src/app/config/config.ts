@@ -64,6 +64,26 @@ export const config = convict({
       default: '',
     },
   },
+  chrome: {
+    headless: {
+      doc: 'Start Chrome in headless mode',
+      format: 'boolean',
+      env: 'CHROME_HEADLESS',
+      default: true,
+    },
+    args: {
+      doc: 'Chrome launch command line args',
+      format: 'cmd',
+      env: 'CHROME_ARGS',
+      default: ['--no-sandbox', '--disable-setuid-sandbox']
+    },
+    pagePoolSize: {
+      doc: 'Chrome pages pool limit',
+      format: 'int',
+      env: 'CHROME_PAGES_POOL_SIZE',
+      default: 5,
+    }
+  }
 })
 
 export type Config = typeof config

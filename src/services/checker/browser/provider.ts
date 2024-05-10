@@ -28,6 +28,7 @@ const UA =
 
 export interface BrowserProviderConfig {
   maxPoolSize: number
+  headless?: boolean
   chromeArgs?: string[]
 }
 
@@ -78,6 +79,7 @@ export class BrowserStatusProvider implements StatusProvider {
   }
 
   private onResult(reqId: RequestId, req: DocumentCheckParams, data: CheckerResponse) {
+    logger.debug({ reqId, req }, 'Got document check result')
     const t = this.timeouts.get(reqId)
     if (t) {
       clearTimeout(t)
@@ -117,6 +119,7 @@ export class BrowserStatusProvider implements StatusProvider {
 
     let page = this.pool.pop()
     if (page && !page.isClosed) {
+      logger.debug('reusing existing page instance')
       this.vacantPages--
       return page
     }
@@ -184,9 +187,10 @@ export class BrowserStatusProvider implements StatusProvider {
     }
   }
 
-  static async create({ maxPoolSize, chromeArgs = CHROME_ARGS }) {
+  static async create({ maxPoolSize, headless = true, chromeArgs = CHROME_ARGS }) {
+    logger.info({ headless, maxPoolSize, chromeArgs }, 'Starting Chrome browser...')
     const browser = await puppeteer.launch({
-      headless: true,
+      headless,
       args: chromeArgs
     })
 
@@ -195,6 +199,7 @@ export class BrowserStatusProvider implements StatusProvider {
   }
 
   async dispose() {
+    logger.info('Closing browser...')
     this.pool.length = 0
     return await this.browser.close()
   }

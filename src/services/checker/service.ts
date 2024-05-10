@@ -3,8 +3,8 @@ import { minutesToMilliseconds, hoursToMilliseconds } from 'date-fns'
 import { BrowserStatusProvider } from './browser/provider.ts';
 import { StatusCacheMiddleware } from './cache.ts';
 import type { DocumentCheckParams, DocumentStatusHandler, StatusProvider, RequestId } from './types.ts';
+import { config } from 'src/app/config/config.ts';
 
-const MAX_POOL_SIZE = 5
 const TTL = hoursToMilliseconds(4)
 const CLEAR_INTERVAL = minutesToMilliseconds(30)
 
@@ -24,7 +24,9 @@ export class StatusCheckerService {
 
   static async create() {
     const browserProvider = await BrowserStatusProvider.create({
-      maxPoolSize: MAX_POOL_SIZE
+      maxPoolSize: config.get('chrome.pagePoolSize'),
+      headless: config.get('chrome.headless'),
+      chromeArgs: config.get('chrome.args')
     })
 
     return new StatusCheckerService(browserProvider)
