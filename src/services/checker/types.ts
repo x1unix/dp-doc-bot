@@ -96,6 +96,9 @@ export interface DocumentStatusHandler {
   handleStatusError(reqId: RequestId, err: QueryError)
 }
 
+/**
+ * Base interface to implement document status provider.
+ */
 export interface StatusProvider {
   /**
    * Sets a handler for document status results.

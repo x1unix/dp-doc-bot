@@ -33,6 +33,11 @@ export interface BrowserProviderConfig {
   chromeArgs?: string[]
 }
 
+/**
+ * Queries document statuses from DPDoc web page using Puppeteer.
+ *
+ * Puppeteer used to bypass Cloudflare, as plain HTTP requests give 403 HTTP error (even with cookies).
+ */
 export class BrowserStatusProvider implements StatusProvider {
   private handler?: DocumentStatusHandler
   private pool: Page[] = []
