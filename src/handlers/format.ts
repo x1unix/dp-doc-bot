@@ -1,11 +1,14 @@
 import { format, differenceInCalendarDays } from 'date-fns'
 import { uk } from 'date-fns/locale/uk'
 
+import { logger } from '../app/logger.ts'
 import { ErrorType, QueryError, type DocumentStatus, StatusCode } from 'src/services/checker/types.ts'
 
 const DP_DOC_URL = 'https://pasport.org.ua/solutions/checker'
 const INTERNAL_ERR_SUFFIX = '\n\nПропоную вам поки в ручному режимі перевірити статус документу на сторінці ДП Документ:\n' +
   DP_DOC_URL
+
+const isValidDate = (date) => date instanceof Date && !isNaN(+date)
 
 export const formatError = (err: any) => {
   const qe = QueryError.from(err)
@@ -44,7 +47,7 @@ export const formatResult = ({ code, message, updatedAt, request }: DocumentStat
       msg = `✅ Документ ${docId} готовий до видачі!`
       break
     default:
-      msg = `ℹ️ Статус документу ${docId}:`
+      msg = `ℹ️ Статус документу ${docId} (код ${code}):`
       break
   }
 
@@ -68,7 +71,14 @@ export const formatResult = ({ code, message, updatedAt, request }: DocumentStat
       break
   }
 
-  const dateFmt = format(updatedAt, 'do MMMM yyyy', { locale: uk })
+  let dateFmt: string
+  try {
+    dateFmt = format(updatedAt, 'do MMMM yyyy', { locale: uk })
+  } catch (err) {
+    logger.error(`Weird date in response - ${err} (value: ${updatedAt})`)
+    dateFmt = 'невідомо'
+  }
+
   msg += `\n\n<b>Відповідь від ДП Документ:</b>\n${message}\n\n` +
     `🕒 Дата оновлення статусу: ${dateFmt} (${diffStr})` +
     '\n\n<i>Зверніть увагу, що відповідь від ДП Документ може відрізнятись від реального статусу вашого документу.</i>\n\n'
