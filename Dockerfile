@@ -24,7 +24,7 @@ RUN apk add --no-cache  \
     ttf-freefont \
     chromium
 
-RUN adduser -D -u 1000 bot && \
+RUN adduser -D -u 1100 bot && \
     mkdir /opt/bot && \
     chown bot:bot /opt/bot
 
