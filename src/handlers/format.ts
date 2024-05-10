@@ -41,7 +41,7 @@ export const formatResult = ({ code, message, rawStatusDate, updatedAt, request 
       msg = `📦 <b>Документ ${docId} відправлено до центру персоналізації</b>`
       break
     case StatusCode.InTransit:
-      msg = `🚚 <b>Документ ${docId} в дорозі до ДП Документ.</b>`
+      msg = `🚚 <b>Документ ${docId} переданий для доставки.</b>`
       break
     case StatusCode.Ready:
       msg = `✅ <b>Документ ${docId} готовий до видачі!</b>`
