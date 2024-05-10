@@ -206,7 +206,7 @@ export class BrowserStatusProvider implements StatusProvider {
   }
 
   static async create({ maxPoolSize, headless = true, chromePath, chromeArgs = CHROME_ARGS }) {
-    logger.info({ headless, maxPoolSize, chromeArgs }, 'Starting Chrome browser...')
+    logger.info({ headless, maxPoolSize, chromeArgs, chromePath }, 'Starting Chrome browser...')
     const browser = await puppeteer.launch({
       headless,
       executablePath: chromePath,

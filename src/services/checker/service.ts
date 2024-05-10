@@ -26,7 +26,8 @@ export class StatusCheckerService {
     const browserProvider = await BrowserStatusProvider.create({
       maxPoolSize: config.get('chrome.pagePoolSize'),
       headless: config.get('chrome.headless'),
-      chromeArgs: config.get('chrome.args')
+      chromeArgs: config.get('chrome.args'),
+      chromePath: config.get('chrome.path'),
     })
 
     return new StatusCheckerService(browserProvider)
