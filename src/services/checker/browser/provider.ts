@@ -154,6 +154,7 @@ export class BrowserStatusProvider implements StatusProvider {
         throw new QueryError(ErrorType.HttpError, `${status} ${statusText}`)
       }
 
+      // Post form data in a browser to bypass CF and capture results in callbacks as Puppeteer can't return promises.
       await page.waitForSelector('form[data-jtoken]', { timeout: 10000 })
       await page.exposeFunction('__onResult__', (reqId, req, rsp) => this.onResult(reqId, req, rsp))
       await page.exposeFunction('__onError__', (reqId, t, err) => this.onError(reqId, t, err))
