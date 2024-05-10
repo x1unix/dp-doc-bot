@@ -6,7 +6,7 @@ import { ErrorType, QueryError, type DocumentStatusHandler, type DocumentCheckPa
 
 import { formatError, formatResult } from './format.ts'
 
-const paperIdRegex = /^([А-ЩЬЮЯҐЄІЇ]{2})(\d{6,7})$$/
+const paperIdRegex = /^([А-ЩЬЮЯҐЄІЇ]{2})(\d{6,7})$$/i
 const cardIdRegex = /^\d{9}$/
 
 const parseMessage = (text: string): DocumentCheckParams | null => {
@@ -36,9 +36,10 @@ export class CheckerHandler implements DocumentStatusHandler {
   async handleMessage(ctx: Context) {
     const params = parseMessage(ctx.text)
     if (!params) {
-      ctx.reply(
+      ctx.replyWithHTML(
         '🤔 Вибачте, але я не розумію вас.\n\n' +
-        'Номер документу має бути у форматі серії та номеру 📘 паспорту, або номер 💳 айді-картки.'
+        'Номер документу має бути у форматі серії та номеру 📘 паспорту, або номер 💳 айді-картки.\n\n' +
+        '<b>Важливо:</b> Серія паспорту має бути <i>кирилицею</i>.'
       )
       return
     }

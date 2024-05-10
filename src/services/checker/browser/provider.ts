@@ -128,7 +128,7 @@ export class BrowserStatusProvider implements StatusProvider {
     // Page not created yet
     page = await this.createPage()
     this.vacantPages--
-    return
+    return page
   }
 
   private returnPage(p?: Page) {
