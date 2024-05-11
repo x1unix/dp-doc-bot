@@ -11,6 +11,14 @@ const INTERNAL_ERR_SUFFIX = '\n\nПропоную вам поки в ручно�
 
 const isValidDate = (date) => date instanceof Date && !isNaN(+date)
 
+export const EXAMPLES_STRING =
+  '\n\nНаприклад:\n\n' +
+  '📘 Закордонний паспорт: <code>FS341265</code> (латинка)\n' +
+  '📖 Паспорт-книжечка: <code>НС3456123</code>\n' +
+  '🪪 Айді-картка: <code>НС3456123</code>\n' +
+  '🧾 Свідоцтво про народження: <code>І-ВЛ 648009</code>, <code>ІІІ-ЯР 627717</code> або <code>ЯИ 376986</code>\n' +
+  '\n\n<b>Важливо:</b>\nСерія внутрішнього паспорту або свідоцтва про народження має бути <i>кирилицею</i>.\n'
+
 export const formatError = (err: any) => {
   const qe = QueryError.from(err)
   let msg: string
@@ -33,22 +41,21 @@ export const formatError = (err: any) => {
   return msg + '\n\n<code>' + qe.message + '</code>' + INTERNAL_ERR_SUFFIX
 }
 
-export const formatResult = ({ code, message, rawStatusDate, updatedAt, request }: DocumentStatus) => {
+export const formatResult = ({ code, message, rawStatusDate, updatedAt }: DocumentStatus) => {
   const now = new Date()
-  const docId = request.series ? `${request.series}${request.number}` : request.number
   let msg: string
   switch (code) {
     case StatusCode.Shipped:
-      msg = `📦 <b>Документ ${docId} відправлено до центру персоналізації</b>`
+      msg = '📦 <b>Документ відправлено до центру персоналізації</b>'
       break
     case StatusCode.InTransit:
-      msg = `🚚 <b>Документ ${docId} переданий для доставки.</b>`
+      msg = '🚚 <b>Документ переданий для доставки.</b>'
       break
     case StatusCode.Ready:
-      msg = `✅ <b>Документ ${docId} готовий до видачі!</b>`
+      msg = '✅ <b>Документ готовий до видачі!</b>'
       break
     default:
-      msg = `ℹ️ <b>Статус документу ${docId} (код ${code}):</b>`
+      msg = `ℹ️ <b>Статус документу (код ${code}):</b>`
       break
   }
 

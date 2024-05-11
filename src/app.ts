@@ -4,7 +4,7 @@ import { Telegraf } from 'telegraf'
 import { config, getWebhookPath, version } from './app/config/config.ts'
 import { logger, Sentry } from './app/logger.ts'
 import { bootstrapService } from './app/app.ts'
-import { retry, sleep } from './app/utils.ts'
+import { retry, sleep } from './utils/retry.ts'
 
 const start = async () => {
   try {

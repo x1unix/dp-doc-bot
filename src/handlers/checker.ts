@@ -8,32 +8,12 @@ import {
   type DocumentStatusHandler,
   type DocumentCheckParams,
   type RequestId,
-  type DocumentStatus
+  type DocumentStatus,
+  DocumentType
 } from '../services/checker/types.ts'
 
-import { formatError, formatResult } from './format.ts'
-
-const paperIdRegex = /^([А-ЩЬЮЯҐЄІЇ]{2})(\d{6,7})$$/i
-const cardIdRegex = /^\d{9}$/
-
-const parseMessage = (text: string): DocumentCheckParams | null => {
-  if (text.length > 32) {
-    return null
-  }
-
-  text = text.trim()
-  if (cardIdRegex.test(text)) {
-    return { number: text }
-  }
-
-  const matches = paperIdRegex.exec(text)
-  if (!matches) {
-    return null
-  }
-
-  const [, series, number] = matches
-  return { series, number }
-}
+import { EXAMPLES_STRING, formatError, formatResult } from './format.ts'
+import { parseDocumentId } from '../utils/parse.ts'
 
 export class CheckerHandler implements DocumentStatusHandler {
   constructor(private bot: Telegraf, private checker: StatusCheckerService) {
@@ -41,19 +21,32 @@ export class CheckerHandler implements DocumentStatusHandler {
   }
 
   async handleMessage(ctx: Context) {
-    const params = parseMessage(ctx.text)
-    if (!params) {
+    const primaryDocument = parseDocumentId(ctx.text)
+    if (!primaryDocument) {
       ctx.replyWithHTML(
         '🤔 Вибачте, але я не розумію вас.\n\n' +
-        'Номер документу має бути у форматі серії та номеру 📘 паспорту, або номер 💳 айді-картки.\n\n' +
-        '<b>Важливо:</b> Серія паспорту має бути <i>кирилицею</i>.'
+        'Вкажіть будь-ласка правильний номер документу, на підставі якого здійснювалось оформлення.' +
+        EXAMPLES_STRING
       )
       return
     }
 
+    let searchByStr = ''
+    switch (primaryDocument.number) {
+      case DocumentType.BirthCertificate:
+        searchByStr = 'за свідоцтвом про народження'
+        break
+      case DocumentType.ID:
+        searchByStr = 'за айді-карткою'
+        break
+      case DocumentType.LegacyPassport:
+        searchByStr = 'за паспортом-книжечкою'
+        break
+    }
+
     try {
-      ctx.reply('🔍 Шукаю інформацію, зачекайте будь-ласка...')
-      await this.checker.queryDocumentStatus(ctx.msg.chat.id, params)
+      ctx.reply(`🔍 Шукаю інформацію ${searchByStr}, зачекайте будь-ласка...`)
+      await this.checker.queryDocumentStatus(ctx.msg.chat.id, { primaryDocument })
     } catch (err: any) {
       this.handleStatusError(ctx.msg.chat.id, QueryError.from(err))
     }

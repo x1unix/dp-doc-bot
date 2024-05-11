@@ -1,5 +1,5 @@
 import { differenceInMilliseconds } from 'date-fns'
-import type { RequestId, DocumentCheckParams, DocumentStatusHandler, StatusProvider, DocumentStatus, QueryError } from './types.ts'
+import { type RequestId, type DocumentCheckParams, type DocumentStatusHandler, type StatusProvider, type DocumentStatus, type QueryError, DocumentType } from './types.ts'
 
 interface CacheEntry {
   createdAt: Date
@@ -59,12 +59,17 @@ export class StatusCacheMiddleware implements StatusProvider, DocumentStatusHand
     this.handler?.handleStatusError(reqId, err)
   }
 
-  private getCacheKey(p: DocumentCheckParams) {
-    if (p.series) {
-      return p.series + p.number
-    }
+  private getCacheKey({ primaryDocument: docRef }: DocumentCheckParams) {
+    const { type, number } = docRef
 
-    return p.number
+    switch (type) {
+      case DocumentType.ID:
+        return `ID:${number}`
+      case DocumentType.BirthCertificate:
+        return `BC:${docRef.series}${number}`
+      case DocumentType.LegacyPassport:
+        return `PS:${docRef.series}${number}`
+    }
   }
 
   private isTtlElapsed(createdAt: Date, now = new Date()) {

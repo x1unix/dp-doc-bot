@@ -1,4 +1,5 @@
 export enum StatusCode {
+  NotFound = 0,     // Невірно введені дані. Будь ласка, введіть коректні дані для перевірки!
   Shipped = 21,     // Відправлено до центру до Персоналізації
   InTransit = 23,   // Документ в дорозі до ДП Документ
   Ready = 24,       // Готовий до видачі, приїхав
@@ -6,16 +7,76 @@ export enum StatusCode {
 
 export type RequestId = number
 
-export interface DocumentCheckParams {
+export enum DocumentType {
   /**
-   * Document series. Usually first two letters of a legacy passport.
+   * New passport ID card.
    */
-  series?: string
+  ID = 'id',
+
+  /**
+   * Legacy paper passport.
+   */
+  LegacyPassport = 'legacyPassport',
+
+  /**
+   * Birth certificate.
+   */
+  BirthCertificate = 'birthCertificate',
+
+  /**
+   * International passport.
+   */
+  InternationalPassport = 'internationalPassport'
+}
+
+/**
+ * Document reference for documents without serial prefix.
+ */
+export interface SimpleDocumentRef {
+  /**
+    * Document type.
+    */
+  type: DocumentType.ID
+
 
   /**
    * Document number as ID.
    */
   number: string
+}
+
+/**
+ * Document reference for documents with serial prefix.
+ */
+export interface SerialDocumentRef {
+  /**
+  * Document type.
+  */
+  type: DocumentType.LegacyPassport | DocumentType.BirthCertificate | DocumentType.InternationalPassport
+
+  /**
+   * Document series. Usually first two letters of a legacy passport.
+   */
+  series: string
+
+  /**
+   * Document number.
+   */
+  number: string
+}
+
+/**
+ * DocumentRef contains document basic information as ID and it's type.
+ */
+export type DocumentRef = SerialDocumentRef | SimpleDocumentRef
+
+export interface DocumentCheckParams {
+  /**
+   * Primary document used to issue a new document request.
+   *
+   * Usually ID or birth certificate.
+   */
+  primaryDocument: DocumentRef
 }
 
 export interface DocumentStatus {
