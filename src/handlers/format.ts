@@ -43,8 +43,15 @@ export const formatError = (err: any) => {
 
 export const formatResult = ({ code, message, rawStatusDate, updatedAt }: DocumentStatus) => {
   const now = new Date()
+
+  const strippedMessage = sanitizeHtml(message, {
+    allowedTags: []
+  })
+
   let msg: string
   switch (code) {
+    case StatusCode.NotFound:
+      return `🙈 <b>Документ не знайдено</b>\n\n${strippedMessage}`
     case StatusCode.Shipped:
       msg = '📦 <b>Документ відправлено до центру персоналізації</b>'
       break
@@ -86,10 +93,6 @@ export const formatResult = ({ code, message, rawStatusDate, updatedAt }: Docume
     logger.warn(`Weird date in response - ${err} (value: ${rawStatusDate})`)
     dateFmt = rawStatusDate || 'не відомо'
   }
-
-  const strippedMessage = sanitizeHtml(message, {
-    allowedTags: []
-  })
 
   msg += `\n\nВідповідь від ДП Документ на сайті:\n<i>${strippedMessage}</i>\n\n` +
     `🕒 Дата оновлення статусу: ${dateFmt} (${diffStr})` +
